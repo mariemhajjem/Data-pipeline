@@ -13,6 +13,6 @@ class TransformBatch:
 
         distinctDF = df.distinct()
         print("Distinct count: " + str(distinctDF.count()))
-        df2 = df.dropDuplicates()
-        print("Distinct count: " + str(df2.count()))
-        df2.show(truncate=False)
+        #df2 = df.dropDuplicates()
+        #print("Distinct count: " + str(df2.count()))
+        #df2.show(truncate=False)

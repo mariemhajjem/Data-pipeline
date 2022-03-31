@@ -1,4 +1,5 @@
-from pyspark.sql.types import IntegerType, StructType, StructField, StringType, DoubleType, BooleanType, ArrayType
+from pyspark.sql.types import IntegerType, StructType, StructField, StringType, DoubleType, BooleanType, ArrayType, \
+    TimestampType
 
 
 class Ingestion:
@@ -7,28 +8,25 @@ class Ingestion:
 
     def ingest_data(self):
         print("Ingesting...")
-        customSchema = StructType([
-            StructField("machineID", StringType(), True),
-            StructField("pressure", DoubleType(), True)
-        ])
 
         shopFloorDataSchema = StructType([
             StructField('_id', StringType(), True),
             StructField('ofId', StringType(), True),
-            StructField('lineId', StringType(), True),
+            StructField('lineId', IntegerType(), True),
             StructField('lineLabel', StringType(), True),
             StructField('shopFloorType', StringType(), True),
-            StructField('dateStart', StringType(), True),
-            StructField('dateFinish', StringType(), True),
-            StructField('data', ArrayType(StructType([
-                StructField('type', StringType()),
-                StructField('quantity', IntegerType())
-            ]))),
+            StructField('dateStart', TimestampType(), True),
+            StructField('dateFinish', TimestampType(), True),
+            StructField('data.quantity', IntegerType(), True),
+            StructField('data.type', StringType(), True),
             StructField('_class', StringType(), True),
             StructField('prodStatus', BooleanType(), True)
         ])
 
-        df = self.spark.read.csv("Machine_telemetry.csv", header=True, inferSchema=True)  # schema=customSchema
+        df = self.spark.read.csv("data/shopFloorData.csv", header=True, inferSchema=True, sep=",")  # schema=shopFloorDataSchema
         # df_load = sparkSession.read.csv('hdfs://localhost:9000/')
-        df.printSchema()
+
+        # print("Count: " + str(df.count()))
+        # distinctDF = df.distinct()
+        # print("Distinct count: " + str(distinctDF.count()))
         return df

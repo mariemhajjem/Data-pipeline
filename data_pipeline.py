@@ -22,7 +22,6 @@ class Pipeline:
 
         transform_process = transform.Transform(self.spark)
         transformed_df = transform_process.transform_data(df)
-        transformed_df.show()
 
         store_process = store.Store(self.spark)
         store_process.store_data(transformed_df)

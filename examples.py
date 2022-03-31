@@ -45,5 +45,5 @@ class Example:
         df1 = df.withColumn('from_timestamp', to_timestamp(col('from_timestamp'))) \
             .withColumn('end_timestamp', current_timestamp()) \
             .withColumn('DiffInSeconds', col("end_timestamp").cast("long") - col('from_timestamp').cast("long")) \
-            .withColumn('DiffInMinutes', round(col('DiffInSeconds')/60)) \
-             .show(truncate=False)
+            .withColumn('DiffInMinutes', round(col('DiffInSeconds') / 60)) \
+            .show(truncate=False)

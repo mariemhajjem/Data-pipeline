@@ -1,6 +1,9 @@
 from pyspark.sql.types import IntegerType, StructType, StructField, StringType, DoubleType
-from pyspark.sql.functions import mean, max, min, col, current_date, datediff, months_between
+from pyspark.sql.functions import mean, max, min, col, current_date, datediff, months_between, lag, desc, when
 import logging
+
+from pyspark.sql.window import Window
+
 
 class Transform:
     def __init__(self, spark):
@@ -10,7 +13,6 @@ class Transform:
         print("transforming...")
 
         logging.debug("debugging..")
-        df.printSchema()
         # df.describe().show()
         # SELECT
         # df.select("machineID", "pressure").show()
@@ -35,8 +37,22 @@ class Transform:
         #     datediff(current_date(), col("datetime")).alias("datediff"),
         #     months_between(current_date(), col("datetime")).alias("monthsdiff")
         # ).show()
-        distinctDF = df.distinct()
-        print("Distinct count: " + str(distinctDF.count()))
-        df1 = df.na.drop()
 
-        return df1
+        # distinctDF = df.distinct()
+        # print("Distinct count: " + str(distinctDF.count()))
+        # df1 = df.na.drop()
+
+        df2 = df.withColumnRenamed("data.type", "type").withColumnRenamed("data.quantity", "quantity").drop("_class")
+
+        df3 = df2.na.fill(value=1, subset=["quantity"])
+
+        df3.show()
+        # windowSpec = Window.partitionBy("ofId").orderBy("dateStart")
+        windowSpec = Window.partitionBy("ofId").orderBy(col('quantity'))
+
+        df4 = df3.withColumn("previousType", lag("type", 1).over(windowSpec)) \
+            .withColumn("previousDate", lag("dateStart", 1).over(windowSpec)) \
+            .withColumn("diffDiffInSeconds", col("dateFinish").cast("long") - col('previousDate').cast("long"))
+        df4.show()
+
+        return df4
