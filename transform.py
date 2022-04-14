@@ -1,5 +1,6 @@
 from pyspark.sql.types import IntegerType, StructType, StructField, StringType, DoubleType
-from pyspark.sql.functions import mean, max, min, col, current_date, datediff, months_between, lag, desc, when
+from pyspark.sql.functions import mean, max, min, col, current_date, datediff, months_between, lag, desc, when, \
+    collect_list
 import logging
 
 from pyspark.sql.window import Window
@@ -54,5 +55,16 @@ class Transform:
             .withColumn("previousDate", lag("dateStart", 1).over(windowSpec)) \
             .withColumn("diffDiffInSeconds", col("dateFinish").cast("long") - col('previousDate').cast("long"))
         df4.show()
+
+        w = Window().partitionBy("col1").orderBy(col('quantity')) \
+            .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+        # df.withColumn("try", collect_list("col2").over(w)) \
+        #     .withColumn("try2", collect_list(unix_timestamp("col4")).over(w)) \
+        #     .withColumn("col5", arrays_zip("try", "try2")).drop("try") \
+        #     .withColumn("try3", element_at("try2", -1)) \
+        #     .withColumn("col5", when(size("try2") > 1, expr("""aggregate(filter(col5, x-> x.try2 <= (try3-7200)),\
+        #                                                      cast(0 as double), (acc,y)-> acc+y.try)""")).otherwise(
+        #     None)) \
+        #     .drop("try3", "try2").orderBy("col1", "col4").show(truncate=False)
 
         return df4
