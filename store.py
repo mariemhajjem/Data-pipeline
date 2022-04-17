@@ -9,7 +9,7 @@ class Store:
 
     def store_data(self, df):
         print("storing...")
-        df.write.option("header","true").csv("transformed_data")
+        df.write.option("header","true").csv("try_data")
         # Write into HDFS
         # df.write.csv("hdfs://localhost:9000/process_data/")
         # df.withColumn("date", to_date("datetime")).write.partitionBy("date").format("csv") \
