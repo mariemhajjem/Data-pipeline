@@ -33,11 +33,11 @@ class Pipeline:
         ingestion_process = ingest.Ingestion(self.spark)
         df = ingestion_process.ingest_data()
         #
-        transform_process = transform.Transform(self.spark)
-        transformed_df = transform_process.transform_data(df)
-
-        store_process = store.Store(self.spark)
-        store_process.store_data(transformed_df)
+        # transform_process = transform.Transform(self.spark)
+        # transformed_df = transform_process.transform_data(df)
+        #
+        # store_process = store.Store(self.spark)
+        # store_process.store_data(transformed_df)
         return
 
     def create_spark_session(self):

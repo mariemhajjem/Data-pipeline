@@ -2,12 +2,13 @@ from pyspark.sql.types import IntegerType, StructType, StructField, StringType, 
 from pyspark.sql.functions import mean, max, min, col, current_date, datediff, months_between, lag, desc, when, \
     collect_list
 import logging
+from pyspark.sql import functions as F, SparkSession
 
 from pyspark.sql.window import Window
 
 
 class Transform:
-    def __init__(self, spark):
+    def __init__(self, spark: SparkSession):
         self.spark = spark
 
     def transform_data(self, df):
@@ -42,7 +43,15 @@ class Transform:
         # distinctDF = df.distinct()
         # print("Distinct count: " + str(distinctDF.count()))
         # df1 = df.na.drop()
-
+        # df.na.fill(50).show()
+        # df.na.drop().show()
+        # df.na \
+        #    .replace(10, 20) \
+        #    .show()
+        # df.select(df.volt.between(22, 24)).show()
+        df.select("volt",  # Show volt and 0 or 1 depending on volt >30
+                  F.when(df.volt > 30, 1) \
+                  .otherwise(0))
         df2 = df.withColumnRenamed("data.type", "type").withColumnRenamed("data.quantity", "quantity").drop("_class")
 
         df3 = df2.na.fill(value=1, subset=["quantity"])
