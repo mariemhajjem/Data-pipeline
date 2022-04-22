@@ -1,7 +1,10 @@
 
 Run data_pipeline.py
+
 ingest from file in transform.py (batch) and kafka topic (stream) in kafka_ingest.py
+
 transform data
+
 store
 
 cd data
