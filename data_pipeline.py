@@ -14,7 +14,7 @@ class Pipeline:
 
     def run_pipeline(self):
         print("Running pipeline")
-        # Run scripts
+        # Run scripts : zookeeper and kafka server
         # filepath="scripts\start-servers.bat"
         # filepath2 = "scripts\kafka-server.bat"
         # s1 = subprocess.Popen(filepath, shell=True, stdout=subprocess.PIPE)
@@ -26,12 +26,12 @@ class Pipeline:
 
         # examples_process = examples.Example(self.spark)
         # examples_process.examples_data()
-
-        # ingestion_process = kafka_ingest.KafkaIngestion(self.spark)
-        # ingestion_process.kafka_ingest()
-
-        ingestion_process = ingest.Ingestion(self.spark)
-        df = ingestion_process.ingest_data()
+        ############## Pipeline ###################
+        kafka_ingestion_process = kafka_ingest.KafkaIngestion(self.spark)
+        kafka_ingestion_process.kafka_ingest()
+        #
+        # ingestion_process = ingest.Ingestion(self.spark)
+        # df = ingestion_process.ingest_data()
         #
         # transform_process = transform.Transform(self.spark)
         # transformed_df = transform_process.transform_data(df)

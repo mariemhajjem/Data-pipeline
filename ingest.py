@@ -26,6 +26,7 @@ class Ingestion:
         #
         # df = self.spark.read.csv("data/shopFloorData.csv", header=True, inferSchema=True, sep=",")  # schema=shopFloorDataSchema
         # df_load = sparkSession.read.csv('hdfs://localhost:9000/')
+
         df = self.spark.read.csv("data/Data_X.csv", header=True, inferSchema=True, sep=",")
         df.head()
         df.printSchema()

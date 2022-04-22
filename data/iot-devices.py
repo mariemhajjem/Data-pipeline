@@ -51,7 +51,7 @@ while True:
  # convert string to  object
     msg = json.dumps(msg)
     # send to Kafka
-    producer.send('raw-iot-data', bytes(msg, encoding='utf8'))
+    producer.send('raw-data', bytes(msg, encoding='utf8'))
 
     print(f'sending data to kafka, #{count}')
     sleep(float(sleep_time))
