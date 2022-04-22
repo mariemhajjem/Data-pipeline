@@ -7,5 +7,6 @@ store
 cd data
 RUN : python iot-devices.py machine1 2
 
-spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.3 data_pipeline.py
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.3,org.apache.spark:spark-streaming-kafka-0-10_2.12:3.1.3 data_
+pipeline.py
 
