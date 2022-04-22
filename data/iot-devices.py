@@ -10,6 +10,7 @@ from time import time, sleep
 #conn = pymongo.MongoClient('mongodb://localhost')
 # db = conn.testDB
 
+#Timeseries collection in mongodb f version 5
 #db.create_collection('testColl', timeseries={ 'timeField': 'timestamp' })
 # db.command('create', 'testColl', timeseries={ 'timeField': 'timestamp', 'metaField': 'data', 'granularity': 'hours' })
 
@@ -48,7 +49,7 @@ while True:
     # json string data
     # msg = {"ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"), "machine_name": machine_name, "temp": temp}
     msg = {"ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "machine_name": machine_name, "temp": temp}
- # convert string to  object
+    # convert string to  object
     msg = json.dumps(msg)
     # send to Kafka
     producer.send('raw-data', bytes(msg, encoding='utf8'))
