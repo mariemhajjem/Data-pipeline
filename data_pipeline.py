@@ -41,7 +41,14 @@ class Pipeline:
         return
 
     def create_spark_session(self):
-        self.spark = SparkSession.builder.appName("Data pipeline").master("local[*]").getOrCreate()
+        self.spark = SparkSession.builder.appName("Data pipeline") \
+            .config("spark.mongodb.input.uri", "mongodb://localhost:27017") \
+            .config("spark.mongodb.output.uri", "mongodb://localhost:27017") \
+            .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.3") \
+            .config("spark.jars.packages", "org.apache.spark:spark-streaming-kafka-0-10_2.12:3.1.3") \
+            .config("spark.jars.packages", "org.mongodb.spark:mongo-spark-connector:10.0.0") \
+            .master("local[*]")\
+            .getOrCreate()
 
 
 if __name__ == '__main__':
