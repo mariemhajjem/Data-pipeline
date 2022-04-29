@@ -3,6 +3,7 @@ import logging.config
 from pyspark.sql import SparkSession
 import subprocess
 import ingest
+import ingest_csv
 import kafka_ingest
 import store
 import transform
@@ -27,6 +28,9 @@ class Pipeline:
         # examples_process = examples.Example(self.spark)
         # examples_process.examples_data()
         ############## Pipeline ###################
+        # csv_ingestion_process = ingest_csv.FileIngest(self.spark)
+        # csv_ingestion_process.file_ingest()
+
         kafka_ingestion_process = kafka_ingest.KafkaIngestion(self.spark)
         kafka_ingestion_process.kafka_ingest()
         #
