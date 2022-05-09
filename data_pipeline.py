@@ -34,7 +34,7 @@ class Pipeline:
         # csv_ingestion_process.file_ingest()
         start_job = time()
         kafka_ingestion_process = kafka_ingest.KafkaIngestion(self.spark)
-        df = kafka_ingestion_process.kafka_ingest()
+        kafka_ingestion_process.kafka_ingest()
         ingestion_process_duration = time() - start_job
         print(f"ingestion process finished in {ingestion_process_duration:.2f} seconds.")
 
@@ -42,25 +42,25 @@ class Pipeline:
         # ingestion_process = ingest.Ingestion(self.spark)
         # df = ingestion_process.ingest_data()
         #
-        start_job = time()
-        # transform_process = transform.Transform(self.spark)
+        # start_job = time()
+        # # transform_process = transform.Transform(self.spark)
+        # # transformed_df = transform_process.transform_data(df)
+        # transform_process_duration = time() - start_job
+        # print(f"transform process finished in {transform_process_duration:.2f} seconds.")
+        #
+        # start_job = time()
+        # transform_process = transform_stream.TransformStream(self.spark)
         # transformed_df = transform_process.transform_data(df)
-        transform_process_duration = time() - start_job
-        print(f"transform process finished in {transform_process_duration:.2f} seconds.")
+        # t_stream_process_duration = time() - start_job
+        # print(f"transform stream process finished in {t_stream_process_duration:.2f} seconds.")
+        #
+        # start_job = time()
+        # store_process = store.Store(self.spark)
+        # store_process.store_data(transformed_df)
+        # storing_process_duration = time() - start_job
+        # print(f"process finished in {storing_process_duration:.2f} seconds.")
 
-        start_job = time()
-        transform_process = transform_stream.TransformStream(self.spark)
-        transformed_df = transform_process.transform_data(df)
-        t_stream_process_duration = time() - start_job
-        print(f"transform stream process finished in {t_stream_process_duration:.2f} seconds.")
-
-        start_job = time()
-        store_process = store.Store(self.spark)
-        store_process.store_data(transformed_df)
-        storing_process_duration = time() - start_job
-        print(f"process finished in {storing_process_duration:.2f} seconds.")
-
-        print(f"total time of process finished in {storing_process_duration+transform_process_duration+ingestion_process_duration:.2f} seconds.")
+        # print(f"total time of process finished in {storing_process_duration+transform_process_duration+ingestion_process_duration:.2f} seconds.")
 
         return
 

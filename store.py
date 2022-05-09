@@ -27,6 +27,13 @@ class Store:
 
         try:
             print("storing...")
+            # table1.write.format("org.apache.spark.sql.cassandra").options(table="othertable", keyspace="ks").save(mode="append")
+            # df.writeStream \
+            #     .trigger(processingTime="5 seconds") \
+            #     .format("org.apache.spark.sql.cassandra") \
+            #     .options(table="randstream", keyspace="kafkaspark") \
+            #     .mode("update") \
+            #     .start()
             query = df.writeStream.outputMode("append").foreachBatch(save).start()
             query.awaitTermination()
         except Exception as exp:

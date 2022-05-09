@@ -41,7 +41,7 @@ count = 0
 
 def run_tests():
     count = 0
-    for item in range(100000):
+    for item in range(100):
         temp = np.random.normal(profile['temp'][0], profile['temp'][1])
         humd = max(0, min(np.random.normal(profile['humd'][0], profile['humd'][1]), 100))
         pres = np.random.normal(profile['pres'][0], profile['pres'][1])

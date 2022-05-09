@@ -27,54 +27,96 @@ class KafkaIngestion:
         kafka_topic = 'machine1'  # 'topic-1' data/iot-devices.py simulator
         kafka_topics = 'data,topic-1'
         os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-streaming-kafka-0-10_2.12:3.1.3,' \
-                                            'org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.3 pyspark-shell '
+                                            'org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.3 pyspark-shell'
+
+        # os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.datastax.spark:spark-cassandra-connector_2.11:2.3.0 --conf spark.cassandra.connection.host=127.0.0.1 pyspark-shell'
 
         # consumer = KafkaConsumer(kafka_topic)
 
         # Read
-        df = self.spark.readStream \
-            .format("kafka") \
-            .option("kafka.bootstrap.servers", kafka_broker) \
-            .option("subscribe", kafka_topic) \
-            .option("startingOffsets", "earliest") \
-            .load()
+        # df = self.spark.readStream \
+        #     .format("kafka") \
+        #     .option("kafka.bootstrap.servers", kafka_broker) \
+        #     .option("subscribe", kafka_topic) \
+        #     .option("startingOffsets", "earliest") \
+        #     .load()
 
         def save(message: DataFrame, epoch_id):
             message.write \
                 .format("mongo") \
                 .mode("append") \
                 .option("database", "industry") \
-                .option("collection", "iot") \
+                .option("collection", "test") \
                 .save()
             pass
 
-        my_topics = ["topic-machine1", "topic-machine1", "topic-machine1"]
+        temp_schema = (StructType()
+                       .add("ts", TimestampType(), True)
+                       .add("machine_name", StringType(), True)
+                       .add("temp", DoubleType(), True)
+                       )
 
-        def read(topic):
+        humd_schema = (StructType()
+                       .add("ts", TimestampType(), True)
+                       .add("machine_name", StringType(), True)
+                       .add("humd", DoubleType(), True)
+                       )
+
+        pres_schema = (StructType()
+                       .add("ts", TimestampType(), True)
+                       .add("machine_name", StringType(), True)
+                       .add("pres", DoubleType(), True)
+                       )
+
+        def read(topic, schema: StructType):
             df = self.spark \
                 .readStream \
                 .format("kafka") \
                 .option("kafka.bootstrap.servers", kafka_broker) \
                 .option("subscribePattern", topic) \
+                .option("startingOffsets", "earliest") \
                 .load() \
                 .selectExpr("CAST(value AS STRING)")
 
-            query = df.writeStream.outputMode("append").foreachBatch(save).start()
-            # query.awaitTermination()
+            df_formatted = df.select(from_json(col("value").cast("string"), schema).alias("value"))
+            if schema == temp_schema:
+                print(temp_schema)
+                df_kafka_formatted = df_formatted.select(
+                    col("value.ts").alias("timestamp"),
+                    col("value.machine_name").alias("machine"),
+                    col("value.temp").alias("temperature")
+                )
+            elif schema == humd_schema:
+                df_kafka_formatted = df_formatted.select(
+                    col("value.ts").alias("timestamp"),
+                    col("value.machine_name").alias("machine"),
+                    col("value.humd").alias("humidity")
+                )
+            else:
+                df_kafka_formatted = df_formatted.select(
+                    col("value.ts").alias("timestamp"),
+                    col("value.machine_name").alias("machine"),
+                    col("value.pres").alias("pression")
+                )
 
+            query = df_kafka_formatted.writeStream.outputMode("append").foreachBatch(save).start()
+            query.awaitTermination()
+
+        # my_topics = ["topic-machine1", "topic-machine2", "topic-machine3"]
+        my_topics = {"topic-machine1": temp_schema, "topic-machine2": humd_schema, "topic-machine3": pres_schema}
 
         def run_with_threads():
             threads = []
-            for topic in my_topics:
+            for key, value in my_topics.items():
                 # `args` is a tuple specifying the positional arguments for the
                 # target function, which will be run in an independent thread.
-                thread = threading.Thread(target=read, args=(topic,))
+                thread = threading.Thread(target=read, args=(key, value))
                 threads.append(thread)
                 thread.start()
 
             for thread in threads:
-                # With `join`, we wait until the thread terminates, either normally
-                # or through an unhandled exception.
+            # With `join`, we wait until the thread terminates, either normally
+            # or through an unhandled exception.
                 thread.join()
 
         run_with_threads()
@@ -93,16 +135,17 @@ class KafkaIngestion:
         #  .load("tcp://{}".format(broker_uri)))
 
         # convert data from kafka to string
-        df_kafka = df.selectExpr("CAST(value AS STRING) as value")
+        # df_kafka = df.selectExpr("CAST(value AS STRING) as value")
+        #
+        # iot_schema = (StructType()
+        #               .add("ts", TimestampType(), True)
+        #               .add("machine_name", StringType(), True)
+        #               .add("temp", DoubleType(), True)
+        #               )
+        #
+        # df_kafka_parsed = df_kafka.select(from_json(col("value").cast("string"), iot_schema).alias("value"))
+        # return df_kafka_parsed
 
-        iot_schema = (StructType()
-                      .add("ts", TimestampType(), True)
-                      .add("machine_name", StringType(), True)
-                      .add("temp", DoubleType(), True)
-                      )
-
-        df_kafka_parsed = df_kafka.select(from_json(col("value").cast("string"), iot_schema).alias("value"))
-        return df_kafka_parsed
         # formattedStream = df_kafka.select(from_csv(df_kafka.value, iot_schema.simpleString()).alias("value"))
         # formattedStream = df_kafka.select(from_csv(df_kafka.value, iot_schema.simpleString())).alias("value"))
         # df_kafka_parsed = df_kafka.select(from_json(df_kafka.value, iot_schema)).alias("value")
